@@ -33,6 +33,7 @@ Si tu modifies le contenu d'un bilan, republie-le simplement dans le dépôt `co
 - `bilan-fake-news-niveau2.html` — Désinformation et IA (Niveau 2)
 - `bilan-formation-influenceurs.html` — Fake News, influenceurs et esprit critique
 - `bilan-rhetorique.html` — Rhétorique et esprit critique
+- `bilan-fake-news-ecologie.html` — Fake News et écologie
 - `images/` — photos illustrant les bilans (médiathèque du cours)
 
 Les liens vers les jeux pointent vers `antoninatger.github.io/jeux/...` (dépôt séparé, déjà en ligne).
