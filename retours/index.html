@@ -20,6 +20,8 @@
     --bilan-dark:    #6d28d9;
     --jeux:          #f59e0b;
     --jeux-dark:     #d97706;
+    --presentation:      #0d9488;
+    --presentation-dark: #0f766e;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -66,7 +68,7 @@
 
   .choix {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
     gap: 20px;
   }
 
@@ -114,9 +116,10 @@
     display: inline-block;
     text-align: center;
     font-weight: 600;
-    font-size: .95rem;
-    padding: 12px 18px;
+    font-size: .9rem;
+    padding: 12px 10px;
     border-radius: 9px;
+    white-space: nowrap;
     color: #fff;
   }
 
@@ -126,6 +129,8 @@
   .c-bilan  .carte-action { background: var(--bilan); }
   .c-jeux   .carte-haut { background: linear-gradient(135deg, var(--jeux) 0%, var(--jeux-dark) 100%); }
   .c-jeux   .carte-action { background: var(--jeux-dark); }
+  .c-presentation .carte-haut { background: linear-gradient(135deg, var(--presentation) 0%, var(--presentation-dark) 100%); }
+  .c-presentation .carte-action { background: var(--presentation-dark); }
 
   footer {
     text-align: center;
@@ -183,6 +188,16 @@
       <div class="carte-bas">
         <p>Les quiz et les jeux d'arcade utilisés pendant la séance, pour retravailler les réflexes d'esprit critique, seul ou en classe.</p>
         <span class="carte-action">Ouvrir les jeux →</span>
+      </div>
+    </a>
+
+    <a class="carte c-presentation" href="presentations/">
+      <div class="carte-haut">
+        <h2>Présentation des formations</h2>
+      </div>
+      <div class="carte-bas">
+        <p>Le programme de chaque intervention&nbsp;: déroulé, notions abordées, objectifs et informations pratiques. Utile pour préparer une séance ou en organiser une.</p>
+        <span class="carte-action">Voir les présentations →</span>
       </div>
     </a>
 
