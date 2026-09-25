@@ -288,6 +288,47 @@
             transform: scale(1.05);
         }
 
+        /* Aller plus loin : le jeu « Pas si vite ! » */
+        .plus-loin {
+            background: #0e1621;
+            color: #eef2f8;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .plus-loin h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .plus-loin p {
+            color: #c3cfdf;
+            max-width: 560px;
+            line-height: 1.6;
+        }
+
+        .plus-loin-btn {
+            background: #25d366;
+            color: #06121c;
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .plus-loin-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+        }
+
         /* Buttons */
         .action-buttons {
             display: flex;
@@ -617,6 +658,7 @@
             /* --- Hors sujet sur papier ------------------------------------ */
             .action-buttons,
             .games-section,
+            .plus-loin,
             .accordion-icon,
             .hero-image,
             .section-image,
@@ -1168,6 +1210,15 @@
                     <a href="https://antoninatger.github.io/jeux/Arcade%20quizz/qcm-classique.html?serie=niveau1" class="game-btn" target="_blank" rel="noopener">Jouer →</a>
                 </div>
             </div>
+        </div>
+
+        <!-- Aller plus loin : le jeu « Pas si vite ! » (bilans/pas-si-vite/) -->
+        <div class="plus-loin">
+            <div>
+                <h3>💬 Pas si vite !</h3>
+                <p>Des amis vous envoient une photo, une pub, un message… et se sont fait avoir. À vous de leur expliquer pourquoi, dans une vraie-fausse conversation : en choisissant la bonne réponse, ou en l'écrivant avec vos mots.</p>
+            </div>
+            <a href="pas-si-vite/?serie=niveau1" class="plus-loin-btn">Je veux aller plus loin pour tester mes connaissances →</a>
         </div>
 
         <!-- Action Buttons -->
