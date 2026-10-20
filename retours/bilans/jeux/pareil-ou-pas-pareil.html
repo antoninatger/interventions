@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pareil ou Pas Pareil ?</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --jaune: #FFD93D;
+    --orange: #FF6B35;
+    --vert: #06D6A0;
+    --rouge: #EF476F;
+    --bleu: #118AB2;
+    --violet: #845EC2;
+    --fond: #FFF8EE;
+    --texte: #2D2D2D;
+    --carte-bg: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--fond);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- CONFETTIS ---- */
+  .confetti-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: -20px;
+    animation: confetti-fall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ---- ÉCRANS ---- */
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+  /* ---- ACCUEIL ---- */
+  #screen-accueil {
+    background: linear-gradient(160deg, #FFD93D 0%, #FF6B35 50%, #EF476F 100%);
+    text-align: center;
+  }
+
+  .titre-jeu {
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(2.2rem, 8vw, 4.5rem);
+    font-weight: 800;
+    color: white;
+    text-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+
+  .sous-titre {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+    margin-bottom: 40px;
+    max-width: 500px;
+  }
+
+  .emoji-deco {
+    font-size: clamp(3rem, 10vw, 6rem);
+    margin-bottom: 20px;
+    display: block;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-15px); }
+  }
+
+  .btn-jouer {
+    background: white;
+    color: var(--orange);
+    border: none;
+    border-radius: 50px;
+    padding: 18px 50px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn-jouer:hover { transform: translateY(-3px); box-shadow: 0 11px 0 rgba(0,0,0,0.15); }
+  .btn-jouer:active { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0,0,0,0.15); }
+
+  .badge-nb {
+    margin-top: 24px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 50px;
+    padding: 8px 20px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* ---- EXPLICATION ---- */
+  #screen-explication {
+    background: var(--fond);
+  }
+
+  .explication-card {
+    background: white;
+    border-radius: 24px;
+    padding: 36px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+
+  .explication-card h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--texte);
+    margin-bottom: 20px;
+  }
+
+  .exemple-pareil {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+    align-items: stretch;
+  }
+  .bulle {
+    flex: 1;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .bulle-a { background: #E8F8F5; color: #0e8a6e; border: 2px solid #06D6A0; }
+  .bulle-b { background: #FEF0E7; color: #b84a1a; border: 2px solid #FF6B35; }
+  .bulle-vs {
+    display: flex;
+    align-items: center;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #aaa;
+  }
+
+  .fleche-pareil {
+    font-size: 2rem;
+    margin: 8px 0;
+  }
+
+  .regle-card {
+    background: #FFF3CD;
+    border: 2px solid #FFD93D;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 20px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #5a4200;
+    line-height: 1.5;
+  }
+
+  /* ---- JEU ---- */
+  #screen-jeu {
+    background: var(--fond);
+    gap: 16px;
+  }
+
+  .barre-haut {
+    width: 100%;
+    max-width: 660px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .score-affiche {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border-radius: 50px;
+    padding: 10px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--texte);
+  }
+
+  .progress-ronde {
+    flex: 1;
+    height: 14px;
+    background: #e8e4db;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .progress-fill-jeu {
+    height: 100%;
+    background: linear-gradient(90deg, var(--vert), var(--bleu));
+    border-radius: 7px;
+    transition: width 0.4s ease;
+  }
+
+  .numero-question {
+    background: white;
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1rem;
+    color: #888;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    white-space: nowrap;
+  }
+
+  /* Cartes */
+  .zone-cartes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 660px;
+  }
+
+  .carte-phrase {
+    background: white;
+    border-radius: 20px;
+    padding: 22px 26px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    border: 3px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .carte-phrase:hover { transform: translateY(-2px); }
+
+  .lettre-carte {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .lettre-A { background: #E8F8F5; color: #06a07a; }
+  .lettre-B { background: #FEF0E7; color: #c95818; }
+
+  .texte-phrase {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    font-weight: 700;
+    color: var(--texte);
+    line-height: 1.5;
+  }
+
+  /* Boutons réponse */
+  .zone-boutons {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+    max-width: 660px;
+    justify-content: center;
+  }
+
+  .btn-reponse {
+    flex: 1;
+    max-width: 280px;
+    border: none;
+    border-radius: 20px;
+    padding: 18px 16px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.2;
+  }
+  .btn-reponse:hover { transform: translateY(-3px); }
+  .btn-reponse:active { transform: translateY(2px); }
+  .btn-reponse .btn-emoji { font-size: 2rem; }
+
+  .btn-pareil {
+    background: var(--vert);
+    color: white;
+    box-shadow: 0 6px 0 #04a07a;
+  }
+  .btn-pareil:hover { box-shadow: 0 9px 0 #04a07a; }
+  .btn-pareil:active { box-shadow: 0 3px 0 #04a07a; }
+
+  .btn-different {
+    background: var(--rouge);
+    color: white;
+    box-shadow: 0 6px 0 #c0294e;
+  }
+  .btn-different:hover { box-shadow: 0 9px 0 #c0294e; }
+  .btn-different:active { box-shadow: 0 3px 0 #c0294e; }
+
+  /* Feedback */
+  .feedback-zone {
+    width: 100%;
+    max-width: 660px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .feedback-bubble {
+    border-radius: 20px;
+    padding: 16px 24px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-align: center;
+    line-height: 1.4;
+    max-width: 560px;
+    animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 100%;
+  }
+  @keyframes pop-in {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .feedback-correct {
+    background: #E8F8F5;
+    color: #0a6b55;
+    border: 3px solid var(--vert);
+  }
+  .feedback-incorrect {
+    background: #FDEEF2;
+    color: #9e1a37;
+    border: 3px solid var(--rouge);
+  }
+
+  .explication-texte {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #555;
+    text-align: center;
+    max-width: 560px;
+    line-height: 1.5;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 18px;
+    border: 2px solid #e8e4db;
+    animation: pop-in 0.3s 0.15s both cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .btn-suivant {
+    background: var(--bleu);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 38px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #0d6b8a;
+    transition: transform 0.1s, box-shadow 0.1s;
+    animation: pop-in 0.3s 0.25s both cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .btn-suivant:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #0d6b8a; }
+  .btn-suivant:active { transform: translateY(3px); box-shadow: 0 2px 0 #0d6b8a; }
+
+  /* Shake animation pour mauvaise réponse */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  /* Surlignage correct */
+  .carte-correct { border-color: var(--vert) !important; background: #E8F8F5 !important; }
+  .carte-incorrect-show { border-color: var(--orange) !important; }
+
+  /* ---- RÉSULTAT ---- */
+  #screen-resultat {
+    background: linear-gradient(160deg, #118AB2 0%, #845EC2 100%);
+    text-align: center;
+    gap: 20px;
+  }
+
+  .resultat-emoji {
+    font-size: clamp(4rem, 15vw, 7rem);
+    animation: bounce 1.5s ease-in-out infinite;
+  }
+
+  .resultat-titre {
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    color: white;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+  }
+
+  .score-final-cercle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  }
+  .score-final-num {
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 2.8rem;
+    color: var(--violet);
+    line-height: 1;
+  }
+  .score-final-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #888;
+  }
+
+  .message-final {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 18px 28px;
+    max-width: 480px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.5;
+  }
+
+  .etoiles {
+    font-size: 2.5rem;
+    letter-spacing: 6px;
+  }
+
+  .btn-rejouer {
+    background: var(--jaune);
+    color: #3a2a00;
+    border: none;
+    border-radius: 50px;
+    padding: 18px 48px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 7px 0 #d4a500;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-rejouer:hover { transform: translateY(-3px); box-shadow: 0 10px 0 #d4a500; }
+  .btn-rejouer:active { transform: translateY(4px); box-shadow: 0 3px 0 #d4a500; }
+
+  /* ---- CHOIX MODE ---- */
+  #screen-mode {
+    background: var(--fond);
+  }
+
+  .mode-card {
+    background: white;
+    border-radius: 24px;
+    padding: 36px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+
+  .mode-card h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--texte);
+    margin-bottom: 10px;
+  }
+
+  .mode-card p {
+    color: #777;
+    font-size: 1rem;
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+
+  .mode-options {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-mode {
+    flex: 1;
+    min-width: 180px;
+    border: none;
+    border-radius: 22px;
+    padding: 26px 20px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.3;
+  }
+  .btn-mode:hover { transform: translateY(-4px); }
+  .btn-mode:active { transform: translateY(2px); }
+  .btn-mode .mode-emoji { font-size: 2.8rem; }
+
+  .btn-mode-rapide {
+    background: var(--vert);
+    color: white;
+    box-shadow: 0 6px 0 #04a07a;
+  }
+  .btn-mode-rapide:hover { box-shadow: 0 10px 0 #04a07a; }
+  .btn-mode-rapide:active { box-shadow: 0 3px 0 #04a07a; }
+
+  .btn-mode-complet {
+    background: var(--violet);
+    color: white;
+    box-shadow: 0 6px 0 #5e3a9e;
+  }
+  .btn-mode-complet:hover { box-shadow: 0 10px 0 #5e3a9e; }
+  .btn-mode-complet:active { box-shadow: 0 3px 0 #5e3a9e; }
+
+  .mode-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    border-radius: 50px;
+    padding: 4px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 480px) {
+    .zone-boutons { flex-direction: column; align-items: center; }
+    .btn-reponse { max-width: 100%; width: 100%; flex-direction: row; justify-content: center; padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-container" id="confettis"></div>
+
+<!-- ACCUEIL -->
+<div class="screen active" id="screen-accueil">
+  <span class="emoji-deco">🤔</span>
+  <h1 class="titre-jeu">Pareil<br>ou Pas Pareil ?</h1>
+  <p class="sous-titre">Sauras-tu reconnaître quand deux phrases disent exactement la même chose… ou pas ?</p>
+  <div class="mode-options" style="margin-bottom: 16px;">
+    <button class="btn-mode btn-mode-rapide" onclick="allerExplication(10)">
+      <span class="mode-emoji">⚡</span>
+      Mode Rapide
+      <span class="mode-badge">10 questions</span>
+      <span style="font-size:0.85rem; font-weight:600; opacity:0.9;">Questions au hasard !</span>
+    </button>
+    <button class="btn-mode btn-mode-complet" onclick="allerExplication(20)">
+      <span class="mode-emoji">🏆</span>
+      Défi Complet
+      <span class="mode-badge">20 questions</span>
+      <span style="font-size:0.85rem; font-weight:600; opacity:0.9;">Toutes les questions !</span>
+    </button>
+  </div>
+</div>
+
+<!-- EXPLICATION -->
+<div class="screen" id="screen-explication">
+  <div class="explication-card">
+    <h2>📖 Comment jouer ?</h2>
+    <p style="color:#555; font-size:1rem; margin-bottom:20px; line-height:1.6;">
+      On te montre deux phrases. Tu dois décider si elles disent <strong>la même chose</strong> (juste avec des mots différents) ou si ce sont vraiment <strong>deux informations différentes</strong>.
+    </p>
+
+    <div class="regle-card">
+      👀 Exemple : <em>"C'est pareil !"</em>
+    </div>
+
+    <div class="exemple-pareil">
+      <div class="bulle bulle-a">😊 « Tu as réussi <strong>17 questions</strong> sur 20 ! »</div>
+      <div class="bulle-vs">VS</div>
+      <div class="bulle bulle-b">😬 « Tu as raté <strong>3 questions</strong> sur 20. »</div>
+    </div>
+    <div style="text-align:center; font-size:1.5rem;">⬇️</div>
+    <div style="background:#E8F8F5; border-radius:14px; padding:12px; font-weight:700; color:#0a6b55; font-size:0.95rem; margin-top:8px;">
+      ✅ C'est pareil ! Les deux parlent du même résultat. On dit juste les choses différemment.
+    </div>
+
+    <div class="regle-card" style="margin-top:20px;">
+      👀 Exemple : <em>"C'est différent !"</em>
+    </div>
+    <div class="exemple-pareil">
+      <div class="bulle bulle-a">🐶 « Ce chien pèse <strong>8 kilos</strong>. »</div>
+      <div class="bulle-vs">VS</div>
+      <div class="bulle bulle-b">🐕 « Ce chien pèse <strong>12 kilos</strong>. »</div>
+    </div>
+    <div style="text-align:center; font-size:1.5rem;">⬇️</div>
+    <div style="background:#FDEEF2; border-radius:14px; padding:12px; font-weight:700; color:#9e1a37; font-size:0.95rem; margin-top:8px;">
+      ❌ C'est différent ! 8 kilos et 12 kilos, ce n'est vraiment pas la même chose.
+    </div>
+
+    <button class="btn-jouer" style="margin-top:28px; width:100%; background: var(--orange); color:white;" onclick="allerChoisirMode()">
+      C'est parti ! 🚀
+    </button>
+  </div>
+</div>
+
+<!-- JEU -->
+<div class="screen" id="screen-jeu">
+  <div class="barre-haut">
+    <div class="score-affiche">⭐ <span id="score-live">0</span></div>
+    <div class="progress-ronde">
+      <div class="progress-fill-jeu" id="progress-jeu" style="width:0%"></div>
+    </div>
+    <div class="numero-question" id="num-question">1 / 20</div>
+  </div>
+
+  <div class="zone-cartes">
+    <div class="carte-phrase" id="carte-A">
+      <div class="lettre-carte lettre-A">A</div>
+      <div class="texte-phrase" id="texte-A"></div>
+    </div>
+    <div class="carte-phrase" id="carte-B">
+      <div class="lettre-carte lettre-B">B</div>
+      <div class="texte-phrase" id="texte-B"></div>
+    </div>
+  </div>
+
+  <div class="zone-boutons">
+    <button class="btn-reponse btn-pareil" onclick="repondre('pareil')">
+      <span class="btn-emoji">😄</span>
+      C'est pareil !
+    </button>
+    <button class="btn-reponse btn-different" onclick="repondre('different')">
+      <span class="btn-emoji">🙅</span>
+      C'est différent !
+    </button>
+  </div>
+
+  <div class="feedback-zone" id="feedback-zone"></div>
+</div>
+
+<!-- RÉSULTAT -->
+<div class="screen" id="screen-resultat">
+  <div class="resultat-emoji" id="resultat-emoji">🏆</div>
+  <div class="etoiles" id="etoiles">⭐⭐⭐</div>
+  <div class="resultat-titre" id="resultat-titre">Bravo !</div>
+  <div class="score-final-cercle">
+    <div class="score-final-num" id="score-final-num">0</div>
+    <div class="score-final-label" id="score-final-label">/ 20</div>
+  </div>
+  <div class="message-final" id="message-final"></div>
+  <button class="btn-rejouer" onclick="recommencer()">🔄 Changer de mode</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// QUESTIONS
+// ═══════════════════════════════════════
+const toutes_questions = [
+
+  // ── PAREIL ──
+  {
+    a: "Ce yaourt contient 10% de matières grasses.",
+    b: "Ce yaourt est composé à 90% sans matières grasses.",
+    reponse: "pareil",
+    explication: "10% de matières grasses et 90% sans matières grasses, c'est exactement la même chose ! On dit juste les choses différemment pour que ça semble meilleur."
+  },
+  {
+    a: "Tu as réussi 17 questions sur 20.",
+    b: "Tu as raté 3 questions sur 20.",
+    reponse: "pareil",
+    explication: "20 – 17 = 3. Que ce soit 17 réussies ou 3 ratées, c'est le même résultat. Mais la première version donne envie de se sentir fier, pas la deuxième !"
+  },
+  {
+    a: "Ce médicament guérit 9 patients sur 10.",
+    b: "Ce médicament ne marche pas sur 1 patient sur 10.",
+    reponse: "pareil",
+    explication: "9 guéris sur 10 = 1 non guéri sur 10. C'est la même réalité. La première version donne plus confiance, pourtant c'est identique."
+  },
+  {
+    a: "Ce verre est à moitié plein.",
+    b: "Ce verre est à moitié vide.",
+    reponse: "pareil",
+    explication: "C'est l'exemple classique de l'effet de cadrage ! La quantité d'eau est exactement la même dans les deux cas."
+  },
+  {
+    a: "Tous mes amis sauf moi ont aimé le film.",
+    b: "Je n'ai pas aimé ce film.",
+    reponse: "pareil",
+    explication: "Les deux phrases disent la même chose : une seule personne n'a pas aimé le film, c'est moi. Mais la première version insiste sur le fait d'être différent de ses amis, ce qui fait plus de peine !"
+  },
+  {
+    a: "Sur notre école de 100 élèves, 95 ont réussi leur brevet.",
+    b: "Sur notre école de 100 élèves, 5 ont raté leur brevet.",
+    reponse: "pareil",
+    explication: "100 – 95 = 5. Les deux phrases parlent du même résultat. On choisit de mettre en avant les 95 réussites ou les 5 échecs selon ce qu'on veut montrer."
+  },
+  {
+    a: "Notre équipe a gagné 3 matchs et en a perdu 2.",
+    b: "Notre équipe a perdu 2 matchs et en a gagné 3.",
+    reponse: "pareil",
+    explication: "C'est exactement le même bilan : 3 victoires et 2 défaites. On commence juste par une information différente."
+  },
+  {
+    a: "Il y a 80% de chances qu'il fasse beau demain.",
+    b: "Il y a 20% de risques qu'il fasse mauvais demain.",
+    reponse: "pareil",
+    explication: "100% – 80% = 20%. Les deux météos annoncent exactement le même temps. La première version est plus joyeuse, la deuxième plus inquiétante."
+  },
+  {
+    a: "Ce sac à dos est fabriqué à 50% avec des matières recyclées.",
+    b: "Ce sac à dos est fabriqué à 50% avec des matières non recyclées.",
+    reponse: "pareil",
+    explication: "50% recyclé et 50% non recyclé, c'est le même sac ! La première version met en avant l'effort écologique, la deuxième ce qui reste à améliorer."
+  },
+  {
+    a: "Ce steak est composé à 80% de viande.",
+    b: "Ce steak contient 20% d'autre chose que de la viande.",
+    reponse: "pareil",
+    explication: "80% de viande = 20% d'autre chose. C'est le même steak ! La première version semble meilleure, mais c'est exactement la même information."
+  },
+  {
+    a: "Les trois quarts de la classe ont eu la moyenne.",
+    b: "Un élève sur quatre n'a pas eu la moyenne.",
+    reponse: "pareil",
+    explication: "3/4 ont réussi = 1/4 n'a pas réussi. C'est la même réalité dans la classe, juste présentée différemment."
+  },
+  {
+    a: "Ne pas porter sa ceinture de sécurité, c'est dangereux.",
+    b: "Porter sa ceinture de sécurité, c'est plus sûr.",
+    reponse: "pareil",
+    explication: "Les deux phrases disent la même chose : la ceinture protège. L'une parle du danger sans ceinture, l'autre de la sécurité avec. Même message !"
+  },
+  {
+    a: "Ce jeu vidéo est interdit aux moins de 12 ans.",
+    b: "Ce jeu vidéo est autorisé aux enfants de 12 ans et plus.",
+    reponse: "pareil",
+    explication: "Interdit aux moins de 12 ans = autorisé à partir de 12 ans. C'est exactement la même règle, juste formulée différemment."
+  },
+
+  // ── DIFFÉRENT ──
+  {
+    a: "Cette pizza a 300 calories.",
+    b: "Cette pizza a 500 calories.",
+    reponse: "different",
+    explication: "300 et 500 calories, ce sont vraiment deux informations différentes. 300 ≠ 500 !"
+  },
+  {
+    a: "Ce jeu est recommandé à partir de 7 ans.",
+    b: "Ce jeu est recommandé à partir de 12 ans.",
+    reponse: "different",
+    explication: "7 ans et 12 ans, ce sont deux âges différents. Ce n'est pas la même recommandation du tout !"
+  },
+  {
+    a: "Il fait 22°C à Paris aujourd'hui.",
+    b: "Il fait 8°C à Paris aujourd'hui.",
+    reponse: "different",
+    explication: "22°C et 8°C, c'est vraiment très différent ! L'un est chaud, l'autre froid."
+  },
+  {
+    a: "Ce livre a 120 pages.",
+    b: "Ce livre a 400 pages.",
+    reponse: "different",
+    explication: "120 pages et 400 pages, ce n'est pas du tout la même longueur. Les deux livres sont vraiment différents."
+  },
+  {
+    a: "Le chat de Léa pèse 4 kilos.",
+    b: "Le chat de Léa pèse 6 kilos.",
+    reponse: "different",
+    explication: "4 kilos et 6 kilos, ce sont deux poids différents. Ce n'est pas la même chose !"
+  },
+  {
+    a: "La piscine ouvre à 9h et ferme à 18h.",
+    b: "La piscine ouvre à 10h et ferme à 17h.",
+    reponse: "different",
+    explication: "Les horaires sont différents ! Dans le premier cas la piscine est ouverte 9 heures, dans le second cas seulement 7 heures."
+  },
+  {
+    a: "Il y a 15 élèves dans cette classe.",
+    b: "Il y a 28 élèves dans cette classe.",
+    reponse: "different",
+    explication: "15 et 28 élèves, ce sont vraiment deux classes de taille différente. Ce n'est pas la même information."
+  },
+  {
+    a: "Ce chocolat contient 70% de cacao.",
+    b: "Ce chocolat contient 30% de cacao.",
+    reponse: "different",
+    explication: "70% et 30% de cacao, ce sont deux chocolats différents ! Le premier est beaucoup plus fort en goût que le second."
+  },
+  {
+    a: "Le trajet dure 90 minutes en voiture.",
+    b: "Le trajet dure 1h30 en voiture.",
+    reponse: "pareil",
+    explication: "90 minutes et 1h30, c'est exactement la même durée ! 60 minutes + 30 minutes = 90 minutes. On a juste utilisé deux façons différentes d'écrire le même temps."
+  },
+  {
+    a: "Ce portable a une batterie de 3000 mAh.",
+    b: "Ce portable a une batterie de 5000 mAh.",
+    reponse: "different",
+    explication: "3000 et 5000 mAh, ce sont deux capacités différentes. La deuxième batterie dure plus longtemps."
+  },
+  {
+    a: "Le score final était 3 à 1.",
+    b: "Le score final était 2 à 2.",
+    reponse: "different",
+    explication: "3-1 et 2-2, ce sont deux résultats vraiment différents : dans le premier cas il y a un gagnant, dans le second c'est un match nul !"
+  },
+];
+
+// ═══════════════════════════════════════
+// ÉTAT DU JEU
+// ═══════════════════════════════════════
+let questions = [];
+let indexQ = 0;
+let score = 0;
+let reponseDonnee = false;
+
+function melangerTableau(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+let nbQuestionsChoisi = 10;
+
+function allerExplication(nb) {
+  nbQuestionsChoisi = nb;
+  afficherEcran('screen-explication');
+}
+
+function allerChoisirMode() {
+  demarrerJeu(nbQuestionsChoisi);
+}
+
+function demarrerJeu(nbQuestions) {
+  // Double mélange pour garantir un ordre vraiment différent à chaque partie
+  const pool = melangerTableau(melangerTableau([...toutes_questions]));
+  questions = nbQuestions === 20 ? pool : pool.slice(0, nbQuestions);
+  indexQ = 0;
+  score = 0;
+  afficherQuestion();
+  afficherEcran('screen-jeu');
+}
+
+function recommencer() {
+  afficherEcran('screen-accueil');
+}
+
+function afficherEcran(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// LOGIQUE JEU
+// ═══════════════════════════════════════
+function afficherQuestion() {
+  const q = questions[indexQ];
+  reponseDonnee = false;
+
+  document.getElementById('texte-A').textContent = q.a;
+  document.getElementById('texte-B').textContent = q.b;
+  document.getElementById('num-question').textContent = `${indexQ + 1} / ${questions.length}`;
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('progress-jeu').style.width = `${(indexQ / questions.length) * 100}%`;
+
+  // Reset cartes
+  const carteA = document.getElementById('carte-A');
+  const carteB = document.getElementById('carte-B');
+  carteA.className = 'carte-phrase';
+  carteB.className = 'carte-phrase';
+
+  // Reset feedback
+  document.getElementById('feedback-zone').innerHTML = '';
+
+  // Réactiver boutons
+  document.querySelectorAll('.btn-reponse').forEach(b => b.disabled = false);
+
+  // Animation d'entrée
+  carteA.style.animation = 'none';
+  carteB.style.animation = 'none';
+  setTimeout(() => {
+    carteA.style.animation = 'pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    carteB.style.animation = 'pop-in 0.35s 0.1s both cubic-bezier(0.34, 1.56, 0.64, 1)';
+  }, 10);
+}
+
+function repondre(choix) {
+  if (reponseDonnee) return;
+  reponseDonnee = true;
+
+  const q = questions[indexQ];
+  const correct = (choix === q.reponse);
+  if (correct) score++;
+
+  document.getElementById('score-live').textContent = score;
+
+  // Désactiver les boutons
+  document.querySelectorAll('.btn-reponse').forEach(b => b.disabled = true);
+
+  // Colorier les cartes
+  const carteA = document.getElementById('carte-A');
+  const carteB = document.getElementById('carte-B');
+  if (correct) {
+    carteA.classList.add('carte-correct');
+    carteB.classList.add('carte-correct');
+  } else {
+    carteA.classList.add('carte-incorrect-show');
+    carteB.classList.add('carte-incorrect-show');
+    carteA.classList.add('shake');
+    carteB.classList.add('shake');
+  }
+
+  // Feedback
+  const zone = document.getElementById('feedback-zone');
+  const iconeFeedback = correct ? '🎉 Bravo !' : '😅 Pas tout à fait…';
+  const couleurFeedback = correct ? 'feedback-correct' : 'feedback-incorrect';
+  const labelReponse = q.reponse === 'pareil'
+    ? '✅ C\'était : <strong>Pareil !</strong>'
+    : '✅ C\'était : <strong>Différent !</strong>';
+
+  zone.innerHTML = `
+    <div class="feedback-bubble ${couleurFeedback}">
+      ${iconeFeedback} ${correct ? '' : labelReponse}
+    </div>
+    <div class="explication-texte">💡 ${q.explication}</div>
+    <button class="btn-suivant" onclick="question_suivante()">
+      ${indexQ + 1 < questions.length ? 'Question suivante →' : 'Voir mon score 🏆'}
+    </button>
+  `;
+}
+
+function question_suivante() {
+  indexQ++;
+  if (indexQ >= questions.length) {
+    afficherResultat();
+  } else {
+    afficherQuestion();
+  }
+}
+
+// ═══════════════════════════════════════
+// RÉSULTAT
+// ═══════════════════════════════════════
+function afficherResultat() {
+  const total = questions.length;
+  const pct = score / total;
+
+  document.getElementById('score-final-num').textContent = score;
+  document.getElementById('score-final-label').textContent = '/ ' + total;
+
+  let emoji, titre, message, etoiles;
+  if (pct === 1) {
+    emoji = '🏆'; titre = 'PARFAIT !'; etoiles = '⭐⭐⭐';
+    message = 'Tu as tout réussi ! Tu es un champion de l\'effet de cadrage. Tu ne te laisseras plus avoir par les mots trompeurs !';
+    lancerConfettis();
+  } else if (pct >= 0.8) {
+    emoji = '🎉'; titre = 'Excellent !'; etoiles = '⭐⭐⭐';
+    message = 'Très bien joué ! Tu reconnais très bien quand on essaie de te présenter les choses de façon trompeuse.';
+    lancerConfettis();
+  } else if (pct >= 0.6) {
+    emoji = '😊'; titre = 'Bien joué !'; etoiles = '⭐⭐';
+    message = 'Pas mal ! Tu commences à repérer l\'effet de cadrage. Rejoue pour t\'améliorer encore !';
+  } else if (pct >= 0.4) {
+    emoji = '🤔'; titre = 'Pas mal !'; etoiles = '⭐';
+    message = 'C\'est un début ! L\'effet de cadrage est parfois difficile à repérer. Rejoue pour t\'entraîner !';
+  } else {
+    emoji = '💪'; titre = 'Continue !'; etoiles = '⭐';
+    message = 'C\'est difficile, hein ? Les mots peuvent vraiment nous tromper ! Rejoue et tu vas progresser.';
+  }
+
+  document.getElementById('resultat-emoji').textContent = emoji;
+  document.getElementById('resultat-titre').textContent = titre;
+  document.getElementById('message-final').textContent = message;
+  document.getElementById('etoiles').textContent = etoiles;
+
+  afficherEcran('screen-resultat');
+}
+
+// ═══════════════════════════════════════
+// CONFETTIS
+// ═══════════════════════════════════════
+function lancerConfettis() {
+  const container = document.getElementById('confettis');
+  container.innerHTML = '';
+  const couleurs = ['#FFD93D','#FF6B35','#EF476F','#06D6A0','#118AB2','#845EC2'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = couleurs[Math.floor(Math.random() * couleurs.length)];
+    piece.style.width = (8 + Math.random() * 10) + 'px';
+    piece.style.height = (8 + Math.random() * 10) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (2 + Math.random() * 3) + 's';
+    piece.style.animationDelay = Math.random() * 1.5 + 's';
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 5000);
+  }
+}
+
+// Init badge
+document.getElementById('badge-nb').textContent = toutes_questions.length + ' questions';
+</script>
+</body>
+</html>
